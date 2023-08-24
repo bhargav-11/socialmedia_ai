@@ -1,0 +1,41 @@
+Facebook:
+
+1.Create a Business Account:
+2.Create a Business Page:
+3.Get Page ID:
+
+Facebook admin
+1.Register as a Meta Developer -- 
+    Access Facebook for Developers:
+
+    Visit the Facebook for Developers website.
+
+2.Create a New App:
+3.Set Up Your App:
+
+Reference Link:
+https://developers.facebook.com/docs/development/create-an-app/
+
+4.Access token Create:
+https://developers.facebook.com/docs/facebook-login/guides/access-tokens/
+
+
+
+-------------------------------------------------Linkedin-----------------------------------------------
+
+1.Access LinkedIn Developer Portal:
+2.Create a New App:
+https://learn.microsoft.com/en-us/linkedin/
+https://learn.microsoft.com/en-us/linkedin/shared/authentication/authentication?context=linkedin/context
+
+3.Create Access token
+
+
+--------------------------------------------twitter-----------------------------------------------------
+
+
+1.Access Twitter Developer Portal:
+2.Create app:
+3.outh2 authetication
+https://developer.twitter.com/en/docs/twitter-api
+https://developer.twitter.com/en/docs/twitter-api/tweets/manage-tweets
