@@ -6,27 +6,28 @@ import json
 from dotenv import load_dotenv
 import os
 import openai
+from flask_cors import CORS
 
 app = Flask(__name__)
-
+CORS(app) 
 load_dotenv()
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 def create_payload(data):
     try:
         data_json = json.loads(data)
-        text = data_json.get("message")
-        image_url = data_json.get("imageurl")
+        text = data_json.get("text")
+        # image_url = data_json.get("imageurl")
         if not text:
             raise ValueError("Message is empty or missing in JSON data")
         
         payload = {
             "text": text,
-            "imageurl": image_url
+            # "imageurl": image_url
         }
         
         # Convert the payload dictionary to JSON
-        payload_json = json.dumps(payload)
+        payload_json = payload
         
         return payload_json
     except Exception as e:
@@ -36,15 +37,14 @@ def create_payload(data):
 def facebook():
     data = request.data.decode('utf-8') 
     payload = create_payload(data)
-    response = post_to_facebook(payload)
-    return {"message" : "Successfully posted"} 
-
+    result = post_to_facebook(payload)
+    return result
 @app.route('/linkedin', methods=['POST'])
-def linkedin_post():
+def linkedin():
     data = request.data.decode('utf-8')
     payload = create_payload(data)
-    post_to_linkedin(payload)
-    return "Success"
+    result = post_to_linkedin(payload)
+    return result
 
     # return {"message" : "Successfully posted"} 
 
@@ -52,8 +52,9 @@ def linkedin_post():
 def twitter():
     data = request.data.decode('utf-8')
     payload = create_payload(data)
-    response =  post_to_twitter(payload)
-    return {"message" : "Successfully posted"} 
+    print("PAYLOAD ::", type(payload))
+    result =  post_to_twitter(payload)
+    return result
 
 @app.route('/generate-post', methods=['POST'])
 def generate_post():

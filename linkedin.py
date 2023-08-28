@@ -10,15 +10,20 @@ LINKEDIN_ACCESS_TOKEN = os.getenv("LINKEDIN_ACCESS_TOKEN")
 # Post content to LinkedIn
 # @app.route('/linkdin', methods=['POST'])
 def post_to_linkedin(payload):
-    url = os.getenv("LINKEDIN_URL")
-    data = request.data.decode('utf-8')
-    linkedin_payload = json.dumps({
+    try:
+        data = request.data.decode('utf-8')
+        
+        # if not data or "message" not in data:
+        #     return jsonify({"error": "Invalid data. 'message' field is required."}), 400
+        url = os.getenv("LINKEDIN_URL")
+        linkedin_payload = json.dumps({
     "author": "urn:li:person:RbA3L6wq3T",
     "lifecycleState": "PUBLISHED",
     "specificContent": {
         "com.linkedin.ugc.ShareContent": {
         "shareCommentary": {
-            "text": json.loads(data).get("message")
+            # "text": payload["message"]
+            "text": json.loads(data).get("generated_post")
             # "message": "hello"
         },
         "shareMediaCategory": "NONE"
@@ -28,17 +33,23 @@ def post_to_linkedin(payload):
         "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
     }
     })
-    print("LinkedIn Payload:", payload)  
-    headers = {
-    'Content-Type': 'application/json',
-    'Authorization': f'Bearer {LINKEDIN_ACCESS_TOKEN}'
-    
-    }
+        print("LinkedIn Payload:", payload)  
+        headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {LINKEDIN_ACCESS_TOKEN}'
+        
+        }
 
-    response = requests.request("POST", url, headers=headers,data=linkedin_payload)
+        response = requests.post(url, data=linkedin_payload, headers=headers)
+        response_data = response.json()
 
-    print(response.text)
-    return {"message" : "Successfully posted"}
+        if response.status_code == 201:
+                return jsonify({"message": "Successfully posted to LinkedIn"}), 201
+        else:
+                return jsonify({"error": "Failed to post to LinkedIn", "response": response_data}), response.status_code
+
+    except Exception as e:
+        return jsonify({"error": "An error occurred", "details": str(e)}), 500
 
   
 
