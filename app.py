@@ -12,49 +12,20 @@ app = Flask(__name__)
 CORS(app) 
 load_dotenv()
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-
 def create_payload(data):
     try:
         data_json = json.loads(data)
-        text = data_json.get("text")
-        # image_url = data_json.get("imageurl")
-        if not text:
+        message = data_json.get("post_message")
+        if not message:
             raise ValueError("Message is empty or missing in JSON data")
-        
+
         payload = {
-            "text": text,
-            # "imageurl": image_url
+            "post_message": message,
         }
-        
-        # Convert the payload dictionary to JSON
-        payload_json = payload
-        
-        return payload_json
+
+        return payload
     except Exception as e:
-        return json.dumps({"error": str(e)})
-
-@app.route('/facebook', methods=['POST'])
-def facebook():
-    data = request.data.decode('utf-8') 
-    payload = create_payload(data)
-    result = post_to_facebook(payload)
-    return result
-@app.route('/linkedin', methods=['POST'])
-def linkedin():
-    data = request.data.decode('utf-8')
-    payload = create_payload(data)
-    result = post_to_linkedin(payload)
-    return result
-
-    # return {"message" : "Successfully posted"} 
-
-@app.route('/twitter', methods=['POST'])
-def twitter():
-    data = request.data.decode('utf-8')
-    payload = create_payload(data)
-    print("PAYLOAD ::", type(payload))
-    result =  post_to_twitter(payload)
-    return result
+        return {"error": str(e)}
 
 @app.route('/generate-post', methods=['POST'])
 def generate_post():
@@ -87,7 +58,33 @@ def generate_post():
         'generated_post': post_content
     }
     return jsonify(response)
+
+
+@app.route('/post', methods=['POST'])
+def post_to_social_media():
+    data = request.data.decode('utf-8') # Assuming you're sending JSON data in the request body
+    try:
+        data_json = json.loads(data)  
+    except json.JSONDecodeError:
+        return {"error": "Invalid JSON payload"}
+    platform = data_json.get('platform')  # Get the 'platform' field from the JSON data
+
+    if not platform:
+        return {"error": "Platform field is missing in the payload"}
+
+    payload = create_payload(data)
     
+    if platform == 'facebook':
+        response = post_to_facebook(payload)
+        return jsonify(response)
+    elif platform == 'linkedin':
+        response = post_to_linkedin(payload)
+        return jsonify(response)
+    elif platform == 'twitter':
+        response = post_to_twitter(payload)
+        return jsonify(response)
+    else:
+        return {"message": "Successfully posted to " + platform}
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

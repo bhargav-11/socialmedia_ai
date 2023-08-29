@@ -1,10 +1,8 @@
-from flask import Flask, request, jsonify
 import tweepy,requests,json
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
-
 
 # Twitter API credentials
 oauth_consumer_key = os.getenv("consumer_key")
@@ -12,23 +10,21 @@ consumer_secret = os.getenv("consumer_secret")
 oauth_token = os.getenv("access_token")
 access_token_secret =os.getenv("access_token_secret")
 oauth_callback= os.getenv("oauth_callback")
+
 # Initialize Tweepy with API credentials
 auth = tweepy.OAuthHandler(oauth_consumer_key, consumer_secret)
 auth.set_access_token(oauth_token, access_token_secret)
 api = tweepy.API(auth)
 
-# @app.route('/twitter', methods=['POST'])
+
 def post_to_twitter(payload):
     try:
-        tweet_text = payload.get("text")
-        # print(tweet_text)
-        print("DATA::", tweet_text[:280])
+        tweet_text = payload.get("post_message")
         url = os.getenv("TWITTER_URL")
         
         payload = json.dumps({
-        "text": tweet_text[:280]
+        "text": tweet_text[:250]
         })
-       
 
         headers = {
                     'Content-Type': 'application/json',
@@ -36,11 +32,14 @@ def post_to_twitter(payload):
         }
 
         response = requests.request("POST", url, headers=headers, data=payload)
+        response_data = response.json()
+
         if response.status_code == 201:
-            return {"message": "Successfully posted to Twitter"}, 201
+            return {"message": "Successfully posted to Twitter"}  
         else:
-            return {"error": "Failed to post to Twitter", "response": response.text}, response.status_code
+            return {"error": "Failed to post to Twitter", "response": response_data}
 
+    except requests.exceptions.RequestException as e:
+        return {"error": "Request error occurred", "details": str(e)}, 500
     except Exception as e:
-        return jsonify({"error": "An error occurred", "details": str(e)}), 500
-
+        return {"error": "An error occurred", "details": str(e)}, 500
