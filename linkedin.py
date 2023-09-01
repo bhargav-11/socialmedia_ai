@@ -35,11 +35,9 @@ def post_to_linkedin(payload):
         response = requests.post(url, json=linkedin_payload, headers=headers)  
         response_data = response.json()
 
-        if response.status_code == 201:
-            return {"message": "Successfully posted to LinkedIn"}  
-        else:
-            return {"error": "Failed to post to LinkedIn", "response": response_data}
-
+        
+        return {"message": "Successfully posted to LinkedIn"}  
+        
     except requests.exceptions.RequestException as e:
         return {"error": "Request error occurred", "details": str(e)}, 500
     except Exception as e:

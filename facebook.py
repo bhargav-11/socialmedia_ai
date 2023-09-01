@@ -20,14 +20,18 @@ def post_to_facebook(payload):
         }
         response = requests.post(url, headers=headers, data=fb_payload)
 
-        response_data = response.json()
+        response_json = response.json()
 
+        # Check for errors in the response JSON
+        if "error" in response_json:
+            error_message = response_json["error"]["message"]
+            return {"error": f"Failed to post to Facebook: {error_message}", "response_code": response.status_code}
+        
+        # Check if the post was created successfully
         if response.status_code == 200:
-            return {"message": "Successfully posted to Facebook"}  
+            return {"message": "Successfully posted to Facebook", "post_id": response_json.get("id")}
         else:
-            return {"error": "Failed to post to Facebook", "response": response_data}
+            return {"error": "Failed to post to Facebook", "response_code": response.status_code}
 
-    except requests.exceptions.RequestException as e:
-        return {"error": "Request error occurred", "details": str(e)}, 500
     except Exception as e:
         return {"error": "An error occurred", "details": str(e)}, 500
