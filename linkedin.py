@@ -25,7 +25,7 @@ def post_to_linkedin(payload):
             "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
         }
         }
-        print("LinkedIn Payload:", payload)  
+
         headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {LINKEDIN_ACCESS_TOKEN}'
@@ -34,11 +34,12 @@ def post_to_linkedin(payload):
 
         response = requests.post(url, json=linkedin_payload, headers=headers)  
         response_data = response.json()
-
+        print("response_data",response_data)
+        if response_data.get("id"):
+            return {"message": "Successfully posted to LinkedIn"}  
+    
+       
+        return {"error": response_data["message"]}, 400
         
-        return {"message": "Successfully posted to LinkedIn"}  
-        
-    except requests.exceptions.RequestException as e:
-        return {"error": "Request error occurred", "details": str(e)}, 500
     except Exception as e:
         return {"error": "An error occurred", "details": str(e)}, 500

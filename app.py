@@ -66,25 +66,23 @@ def post_to_social_media():
     try:
         data_json = json.loads(data)  
     except json.JSONDecodeError:
-        return {"error": "Invalid JSON payload"}
+        return {"error": "Invalid JSON payload"}, 400
     platform = data_json.get('platform')  # Get the 'platform' field from the JSON data
-
     if not platform:
-        return {"error": "Platform field is missing in the payload"}
+        return {"error": "Platform field is missing in the payload"}, 400
 
     payload = create_payload(data)
     
     if platform == 'facebook':
         response = post_to_facebook(payload)
-        return jsonify(response)
     elif platform == 'linkedin':
         response = post_to_linkedin(payload)
-        return jsonify(response)
     elif platform == 'twitter':
         response = post_to_twitter(payload)
-        return jsonify(response)
     else:
-        return {"message": "Successfully posted to " + platform}
+        return {"error": "Wrong platform passed in body " + platform}, 404
+    
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True)

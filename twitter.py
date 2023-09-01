@@ -27,12 +27,13 @@ def post_to_twitter(payload):
         )
 
         response = client.create_tweet(text=tweet_text)
-       
-        return {"message": "Successfully posted to Twitter", "tweet_id": response}
-      
+        
+        print("response_data",response.json())
+        return {"message": "Successfully posted to Twitter"} , 200
 
-    except ValueError as ve:
-        return {"error": "Failed to post to Twitter", "response_code": response.status_code}
+    except Exception as ve:
+        if len(ve.api_messages) > 0:
+            return {"error": ve.api_messages[0]}, 400
+        else:
+         return {"error": "Fail to tweet"}, 400
        
-    except tweepy.TweepyException as te:
-        return {"error": f"Tweepy error: {str(te)}"}
